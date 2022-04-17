@@ -2,9 +2,10 @@ import { Box, Flex, Text } from "@chakra-ui/layout"
 import React from "react"
 import {
   Album,
-  ArtistData,
-  CurrentUsersPlaylist,
-  AlbumTrack,
+  Artist,
+  Playlist,
+  PlaylistTrack,
+  Track,
 } from "../../lib/Interfaces/interfaces"
 import { Image, useMediaQuery } from "@chakra-ui/react"
 import SongIndicator from "../Song/SongIndicator"
@@ -12,7 +13,7 @@ import { formatNumber } from "../../lib/Formatters/format"
 
 type Props = {
   color?: string
-  playlist?: CurrentUsersPlaylist | AlbumTrack[]
+  playlist?: Playlist | Track[] | PlaylistTrack[] | []
   album?: Album
   children: React.ReactNode
   explicitColor?: string
@@ -23,7 +24,7 @@ type Props = {
   title: string
   owner?: string
   roundedImage?: true
-  artist?: ArtistData
+  artist?: Artist
 }
 
 const GradientBackground: React.FC<Props> = ({
@@ -81,7 +82,7 @@ const GradientBackground: React.FC<Props> = ({
             alt="Image"
             height="235px"
             width="235px"
-            borderRadius={roundedImage ? "100%" : "0"}
+            borderRadius={roundedImage ? "50%" : "0"}
           />
           <Flex align="end">
             <Box
@@ -118,25 +119,25 @@ const GradientBackground: React.FC<Props> = ({
               <Box fontSize="14px" fontWeight="400">
                 {type === "PLAYLIST" &&
                   `${playlist?.owner?.display_name || owner} · ${
-                    playlist?.tracks?.total || playlist.length
+                    playlist?.tracks?.total || playlist!.length
                   } total
                 songs`}
                 {type === "ARTIST" &&
-                  `${formatNumber(artist.followers.total)} total followers`}
+                  `${formatNumber(artist!.followers.total)} total followers`}
                 {type === "ALBUM" && (
                   <Flex align="center" gap="5px">
                     <Image
                       alt="Album Image"
-                      src={album.images[0].url}
+                      src={album!.images[0].url}
                       objectFit="contain"
                       height="28px"
                       width="28px"
                       borderRadius="50%"
                     />
                     <Text>
-                      {album.artists[0].name} ·{" "}
-                      {album.release_date.substring(0, 4)} ·{" "}
-                      {album.tracks.total} songs
+                      {album!.artists[0].name} ·{" "}
+                      {album!.release_date.substring(0, 4)} ·{" "}
+                      {album!.tracks.total} songs
                     </Text>
                   </Flex>
                 )}

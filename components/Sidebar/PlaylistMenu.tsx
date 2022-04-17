@@ -9,13 +9,13 @@ import Link from "next/link"
 import { useRouter } from "next/router"
 import { useSession } from "next-auth/react"
 import { useEffect, useState } from "react"
-import { CurrentUsersPlaylist } from "../../lib/Interfaces/interfaces"
+import { UserPlaylist } from "../../lib/Interfaces/interfaces"
 import spotify from "../../lib/SpotifyApi/spotify"
 
 const PlaylistMenu = () => {
   const router = useRouter()
   const { data: session } = useSession()
-  const [userPlaylists, setUserPlaylists] = useState<CurrentUsersPlaylist[]>()
+  const [userPlaylists, setUserPlaylists] = useState<UserPlaylist[]>()
 
   useEffect(() => {
     ;(async () => {

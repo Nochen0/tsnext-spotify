@@ -2,7 +2,7 @@ import { useSession } from "next-auth/react"
 import Head from "next/head"
 import { useEffect, useState } from "react"
 import spotify from "../../../lib/SpotifyApi/spotify"
-import { PlaylistTrack } from "../../../lib/Interfaces/interfaces"
+import { PlaylistTrack, SavedTracks } from "../../../lib/Interfaces/interfaces"
 import Song from "../../../components/Song/Song"
 import GradientBackground from "../../../components/Layout/GradientBackground"
 import NoLikedSongs from "../../../components/Layout/NoLikedSongs"
@@ -10,16 +10,13 @@ import Loading from "../../../components/Layout/Loading"
 
 const SavedSongs = () => {
   const { data: session } = useSession()
-  const [usersSavedTracks, setUsersSavedTracks] = useState<any>()
-  const [loading, setLoading] = useState(false)
+  const [usersSavedTracks, setUsersSavedTracks] = useState<SavedTracks>()
 
   useEffect(() => {
     ;(async () => {
       if (session?.accessToken) {
-        setLoading(true)
         const response = await spotify.getUserSavedTracks(session.accessToken)
         setUsersSavedTracks(response)
-        setLoading(true)
       }
     })()
   }, [session])

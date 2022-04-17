@@ -5,7 +5,7 @@ import { getColor } from "../../lib/HelperData/HelperFunctions"
 import { useEffect, useState } from "react"
 import spotify from "../../lib/SpotifyApi/spotify"
 import { useSession } from "next-auth/react"
-import { CurrentUsersPlaylist } from "../../lib/Interfaces/interfaces"
+import { Playlist } from "../../lib/Interfaces/interfaces"
 import Loading from "../../components/Layout/Loading"
 import Song from "../../components/Song/Song"
 import Head from "next/head"
@@ -14,7 +14,7 @@ const Playlist = ({ color }: { color: { color: string } }) => {
   const router = useRouter()
   const { data: session } = useSession()
   const { playlistId } = router.query
-  const [playlist, setPlaylist] = useState<CurrentUsersPlaylist>()
+  const [playlist, setPlaylist] = useState<Playlist>()
   const [invalidId, setInvalidId] = useState(false)
 
   useEffect(() => {

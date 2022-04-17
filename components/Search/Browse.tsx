@@ -28,8 +28,6 @@ const Browse = () => {
       </Text>
       <Flex flexWrap="wrap" gap="20px">
         {categories.categories.items.map((category, index) => {
-          const color = randomColor()
-          console.log(color)
           return (
             <Box
               cursor="pointer"

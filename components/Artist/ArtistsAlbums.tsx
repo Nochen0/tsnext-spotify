@@ -1,7 +1,7 @@
 import { Flex, Text } from "@chakra-ui/layout"
 import { useSession } from "next-auth/react"
 import React, { useEffect, useState } from "react"
-import { ArtistAlbum } from "../../lib/Interfaces/interfaces"
+import { _Album } from "../../lib/Interfaces/interfaces"
 import spotify from "../../lib/SpotifyApi/spotify"
 import BoxWrapper from "../Layout/BoxWrapper"
 
@@ -13,7 +13,7 @@ type Props = {
 
 const ArtistsAlbums: React.FC<Props> = ({ slice, artistId, exclude }) => {
   const { data: session } = useSession()
-  const [albums, setAlbums] = useState<ArtistAlbum[]>()
+  const [albums, setAlbums] = useState<_Album[]>()
 
   useEffect(() => {
     ;(async () => {
@@ -23,7 +23,7 @@ const ArtistsAlbums: React.FC<Props> = ({ slice, artistId, exclude }) => {
           session.accessToken
         )
         if (exclude) {
-          setAlbums(response.items.filter((item: any) => item.id !== exclude))
+          setAlbums(response.items.filter(item => item.id !== exclude))
         } else {
           setAlbums(response.items)
         }

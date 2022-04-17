@@ -1,8 +1,8 @@
 import { Box, Flex, Text } from "@chakra-ui/layout"
-import { signOut, useSession } from "next-auth/react"
+import { useSession } from "next-auth/react"
 import { useEffect, useState } from "react"
 import BoxWrapper from "../../../components/Layout/BoxWrapper"
-import { CurrentUsersPlaylist } from "../../../lib/Interfaces/interfaces"
+import { SavedTracks, UserPlaylist } from "../../../lib/Interfaces/interfaces"
 import spotify from "../../../lib/SpotifyApi/spotify"
 import { MdOutlinePlayCircleFilled } from "react-icons/md"
 import { IconButton } from "@chakra-ui/react"
@@ -11,8 +11,8 @@ import Head from "next/head"
 
 const PlaylistsMenu = () => {
   const { data: session } = useSession()
-  const [playlists, setPlaylists] = useState<CurrentUsersPlaylist[]>()
-  const [usersSavedTracks, setUsersSavedTracks] = useState<any>()
+  const [playlists, setPlaylists] = useState<UserPlaylist[]>()
+  const [usersSavedTracks, setUsersSavedTracks] = useState<SavedTracks>()
   const router = useRouter()
 
   useEffect(() => {

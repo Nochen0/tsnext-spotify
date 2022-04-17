@@ -4,43 +4,24 @@ import { useSession } from "next-auth/react"
 import Head from "next/head"
 import { useEffect, useState } from "react"
 import spotify from "../../lib/SpotifyApi/spotify"
-import { Track } from "../../lib/Interfaces/interfaces"
+import {
+  PlaylistTrack,
+  SearchAlbum,
+  SearchArtist,
+  SearchPlaylist,
+  Track,
+} from "../../lib/Interfaces/interfaces"
 import BoxWrapper from "../../components/Layout/BoxWrapper"
 import Song from "../../components/Song/Song"
 import { MdClose, MdPlayCircleFilled, MdSearch } from "react-icons/md"
 import Browse from "../../components/Search/Browse"
 
-interface album {
-  id: string
-  image: string
-  name: string
-  release_date: string
-}
-
-interface artists {
-  followers: number
-  genres: string
-  id: string
-  image: string
-  name: string
-  popularity: number
-}
-
-interface playlists {
-  description: string
-  id: string
-  image: string
-  name: string
-  owner: string
-  ownerId: string
-}
-
 const Home = () => {
   const [inputValue, setInputValue] = useState<string>("")
   const { data: session } = useSession()
-  const [albums, setAlbums] = useState<album[]>()
-  const [artists, setArtists] = useState<artists[]>()
-  const [playlists, setPlaylists] = useState<playlists[]>()
+  const [albums, setAlbums] = useState<SearchAlbum[]>()
+  const [artists, setArtists] = useState<SearchArtist[]>()
+  const [playlists, setPlaylists] = useState<SearchPlaylist[]>()
   const [tracks, setTracks] = useState<{ track: Track }[]>()
 
   useEffect(() => {
@@ -51,6 +32,7 @@ const Home = () => {
           session.accessToken
         )
         const { artists, albums, tracks, playlists } = response
+        console.log(tracks)
         setArtists(artists)
         setAlbums(albums)
         setTracks(tracks)
@@ -121,7 +103,7 @@ const Home = () => {
         {inputValue ? (
           <>
             <Flex flexWrap="wrap">
-              {tracks?.length > 0 && (
+              {tracks !== undefined && tracks?.length > 0 && (
                 <Box height="240px" width="30%" marginBottom="100px">
                   <Text fontSize="2xl" marginBottom="20px">
                     Top result
@@ -129,7 +111,7 @@ const Home = () => {
                   <Box>
                     <BoxWrapper
                       roundedImage
-                      imageUrl={tracks[0]?.track.album.images[0].url}
+                      imageUrl={tracks[0]?.track?.album?.images[0].url}
                       height={200}
                       width={450}
                       external
@@ -166,7 +148,7 @@ const Home = () => {
                   </Box>
                 </Box>
               )}
-              {tracks?.length > 0 && (
+              {tracks !== undefined && tracks?.length > 0 && (
                 <Box width="66%" minW="650px">
                   <Text fontSize="2xl" marginBottom="20px">
                     Songs
@@ -176,10 +158,10 @@ const Home = () => {
                       return (
                         <Song
                           key={index}
-                          track={track}
+                          track={track as PlaylistTrack}
                           index={index}
                           total={tracks.length}
-                          tracks={tracks}
+                          tracks={tracks as PlaylistTrack[]}
                           noDate
                         />
                       )
@@ -188,7 +170,7 @@ const Home = () => {
                 </Box>
               )}
             </Flex>
-            {artists?.length > 0 && (
+            {artists !== undefined && artists?.length > 0 && (
               <Box minW="512px">
                 <Text fontSize="2xl" marginBottom="20px" marginY="32px">
                   Artists
@@ -217,7 +199,7 @@ const Home = () => {
                 </Flex>
               </Box>
             )}
-            {albums?.length > 0 && (
+            {albums !== undefined && albums?.length > 0 && (
               <Box minW="512px">
                 <Text fontSize="2xl" marginBottom="20px" marginY="25px">
                   Albums
@@ -243,7 +225,7 @@ const Home = () => {
                 </Flex>
               </Box>
             )}
-            {playlists?.length > 0 && (
+            {playlists !== undefined && playlists?.length > 0 && (
               <Box minW="512px">
                 <Text fontSize="2xl" marginBottom="20px" marginY="25px">
                   Playlists

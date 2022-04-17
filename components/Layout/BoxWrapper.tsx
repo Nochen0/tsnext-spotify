@@ -5,7 +5,7 @@ import React from "react"
 
 type Props = {
   children: React.ReactNode
-  imageUrl: string
+  imageUrl: string | undefined
   roundedImage: boolean
   route?: string
   width?: number

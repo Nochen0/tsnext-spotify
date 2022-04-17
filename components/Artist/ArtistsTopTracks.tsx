@@ -4,11 +4,11 @@ import { PlaylistTrack } from "../../lib/Interfaces/interfaces"
 import Song from "../Song/Song"
 
 type Props = {
-  topTracks: PlaylistTrack[] | undefined
+  topTracks: PlaylistTrack[]
 }
 
 const ArtistsTopTracks: React.FC<Props> = ({ topTracks }) => {
-  const [modified, setModified] = useState<any>()
+  const [modified, setModified] = useState<{ track: PlaylistTrack }[]>()
   const [more, setMore] = useState(false)
 
   useEffect(() => {
@@ -21,26 +21,26 @@ const ArtistsTopTracks: React.FC<Props> = ({ topTracks }) => {
   return (
     <Box paddingRight="15%">
       {!more
-        ? modified?.slice(0, 5).map((track: any, index: number) => {
+        ? modified?.slice(0, 5).map((track, index: number) => {
             return (
               <Song
                 key={index}
-                track={track}
+                track={track as unknown as PlaylistTrack}
                 index={index}
                 total={-1}
-                tracks={modified as PlaylistTrack[]}
+                tracks={modified as unknown as PlaylistTrack[]}
                 artist
               />
             )
           })
-        : modified?.slice(0, 10).map((track: any, index: number) => {
+        : modified?.slice(0, 10).map((track, index: number) => {
             return (
               <Song
                 key={index}
-                track={track}
+                track={track as unknown as PlaylistTrack}
                 index={index}
                 total={-1}
-                tracks={modified as PlaylistTrack[]}
+                tracks={modified as unknown as PlaylistTrack[]}
                 artist
               />
             )

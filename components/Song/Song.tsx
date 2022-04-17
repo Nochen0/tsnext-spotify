@@ -1,7 +1,6 @@
 import { Box, Flex, Link as ChakraLink, Text } from "@chakra-ui/layout"
 import React, { BaseSyntheticEvent } from "react"
 import { PlaylistTrack } from "../../lib/Interfaces/interfaces"
-import Link from "next/link"
 import { Image, useMediaQuery } from "@chakra-ui/react"
 import { format, dateDiff } from "../../lib//Formatters/format"
 import { useAppDispatch, useAppSelector } from "../../store/store"

@@ -1,18 +1,12 @@
-import { Box, Flex, Text } from "@chakra-ui/layout"
-import { Image, useMediaQuery } from "@chakra-ui/react"
+import { Box, Text } from "@chakra-ui/layout"
 import { GetServerSideProps, GetServerSidePropsContext } from "next"
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/router"
 import { useEffect, useState } from "react"
 import ArtistsAlbums from "../../components/Artist/ArtistsAlbums"
 import ArtistsTopTracks from "../../components/Artist/ArtistsTopTracks"
-import { formatNumber } from "../../lib/Formatters/format"
-import { getColor, randomColor } from "../../lib/HelperData/HelperFunctions"
-import {
-  ArtistAlbum,
-  ArtistData,
-  PlaylistTrack,
-} from "../../lib/Interfaces/interfaces"
+import { getColor } from "../../lib/HelperData/HelperFunctions"
+import { Artist, PlaylistTrack } from "../../lib/Interfaces/interfaces"
 import spotify from "../../lib/SpotifyApi/spotify"
 import ArtistRelatedArtists from "../../components/Artist/ArtistRelatedArtists"
 import GradientBackground from "../../components/Layout/GradientBackground"
@@ -20,7 +14,7 @@ import Head from "next/head"
 
 const Artist = ({ color }: { color: { color: string } }) => {
   const { data: session } = useSession()
-  const [artist, setArtist] = useState<ArtistData>()
+  const [artist, setArtist] = useState<Artist>()
   const router = useRouter()
   const artistId = router.query.artistId
   const [artistsTopTracks, setArtistsTopTracks] = useState<PlaylistTrack[]>()

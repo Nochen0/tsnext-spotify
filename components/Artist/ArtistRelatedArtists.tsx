@@ -1,7 +1,7 @@
 import { Flex, Text, Box } from "@chakra-ui/layout"
 import { useSession } from "next-auth/react"
 import React, { useEffect, useState } from "react"
-import { ArtistData } from "../../lib/Interfaces/interfaces"
+import { Artist } from "../../lib/Interfaces/interfaces"
 import spotify from "../../lib/SpotifyApi/spotify"
 import BoxWrapper from "../Layout/BoxWrapper"
 
@@ -11,7 +11,7 @@ type Props = {
 
 const ArtistRelatedArtists: React.FC<Props> = ({ artistId }) => {
   const { data: session } = useSession()
-  const [artists, setArtists] = useState<ArtistData[]>()
+  const [artists, setArtists] = useState<Artist[]>()
 
   useEffect(() => {
     ;(async () => {

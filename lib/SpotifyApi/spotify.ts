@@ -1,26 +1,21 @@
 import {
-  SearchTrackResults,
-  SearchAlbumResults,
-  SearchArtistResults,
-  SearchPlaylistResults,
-  ISearch,
-  GetTracks,
+  Album,
+  Artist,
+  ArtistRelatedArtists,
+  ArtistsAlbums,
   ArtistsTopTracks,
+  Playlist,
+  SavedTracks,
+  SearchAlbum,
+  SearchArtist,
+  SearchPlaylist,
+  SearchTrack,
+  SearchI,
+  UserPlaylist,
   Categories,
   CategoryPlaylists,
-  FeaturedPlaylists,
-  NewReleases,
-  Playlist,
-  SavedAlbums,
   Category,
-} from "../Interfaces/interfaces"
-
-import {
-  Album,
-  ArtistData,
-  CurrentUsersPlaylist,
-  Image,
-  PlaylistTrack,
+  Error,
 } from "../Interfaces/interfaces"
 
 const spotify = {
@@ -31,7 +26,7 @@ const spotify = {
       },
     })
     const jsonResponse = await response.json()
-    const responseItems: CurrentUsersPlaylist[] = jsonResponse.items
+    const responseItems: UserPlaylist[] = jsonResponse.items
     return responseItems
   },
   getPlaylist: async (
@@ -46,7 +41,7 @@ const spotify = {
         },
       }
     )
-    const jsonResponse: CurrentUsersPlaylist = await response.json()
+    const jsonResponse: Playlist = await response.json()
     return jsonResponse
   },
   getUserSavedTracks: async (token: string | unknown) => {
@@ -55,7 +50,7 @@ const spotify = {
         Authorization: `Bearer ${token}`,
       },
     })
-    const jsonResponse = await response.json()
+    const jsonResponse: SavedTracks = await response.json()
     return jsonResponse
   },
   getArtist: async (
@@ -70,7 +65,7 @@ const spotify = {
         },
       }
     )
-    const jsonResponse: ArtistData = await response.json()
+    const jsonResponse: Artist = await response.json()
     return jsonResponse
   },
   getArtistsTopTracks: async (
@@ -85,7 +80,7 @@ const spotify = {
         },
       }
     )
-    const jsonResponse = await response.json()
+    const jsonResponse: ArtistsTopTracks = await response.json()
     return jsonResponse
   },
   getArtistsAlbums: async (
@@ -100,7 +95,7 @@ const spotify = {
         },
       }
     )
-    const jsonResponse = await response.json()
+    const jsonResponse: ArtistsAlbums = await response.json()
     return jsonResponse
   },
   getArtistRelatedArtists: async (
@@ -115,7 +110,7 @@ const spotify = {
         },
       }
     )
-    const jsonResponse = await response.json()
+    const jsonResponse: ArtistRelatedArtists = await response.json()
     return jsonResponse
   },
   getAlbum: async (
@@ -134,10 +129,10 @@ const spotify = {
     return jsonResponse
   },
   searchAll: async (term: string, token: string | unknown) => {
-    let searchTrackResults: any[] = []
-    let searchAlbumResults: SearchAlbumResults[] = []
-    let searchArtistResults: SearchArtistResults[] = []
-    let searchPlaylistResults: SearchPlaylistResults[] = []
+    let searchTrackResults: SearchTrack[] = []
+    let searchAlbumResults: SearchAlbum[] = []
+    let searchArtistResults: SearchArtist[] = []
+    let searchPlaylistResults: SearchPlaylist[] = []
 
     try {
       const response = await fetch(
@@ -148,7 +143,7 @@ const spotify = {
           },
         }
       )
-      const jsonResponse: ISearch = await response.json()
+      const jsonResponse: SearchI = await response.json()
 
       if (jsonResponse.tracks && jsonResponse.tracks.items) {
         searchTrackResults = jsonResponse.tracks.items.map(item => {
@@ -171,7 +166,7 @@ const spotify = {
           return {
             id: artist.id,
             name: artist.name,
-            image: artist.images.map((image: Image) => image.url)[0],
+            image: artist.images.map(image => image.url)[0],
             followers: artist.followers.total,
             genres: artist.genres.join(", "),
             popularity: artist.popularity,
@@ -255,7 +250,7 @@ const spotify = {
         method: "GET",
       }
     )
-    const jsonResponse: FeaturedPlaylists = await response.json()
+    const jsonResponse = await response.json()
     return jsonResponse
   },
   getNewReleases: async (token: string | unknown) => {
@@ -270,7 +265,7 @@ const spotify = {
         method: "GET",
       }
     )
-    const jsonResponse: NewReleases = await response.json()
+    const jsonResponse = await response.json()
     return jsonResponse
   },
   getCategory: async (
@@ -290,6 +285,19 @@ const spotify = {
       }
     )
     const jsonResponse: Category = await response.json()
+    return jsonResponse
+  },
+
+  getUsersTopItems: async (type: string, token: string | unknown) => {
+    const headers = {
+      Authorization: `Bearer ${token}`,
+      "content-type": "application/json",
+    }
+    const response = await fetch(`https://api.spotify.com/v1/me/top/${type}`, {
+      headers: headers,
+      method: "GET",
+    })
+    const jsonResponse = await response.json()
     return jsonResponse
   },
 }
