@@ -1,0 +1,93 @@
+import { Box, Flex, Text } from "@chakra-ui/layout"
+import { Image, useMediaQuery } from "@chakra-ui/react"
+import { GetServerSideProps, GetServerSidePropsContext } from "next"
+import { useSession } from "next-auth/react"
+import { useRouter } from "next/router"
+import { useEffect, useState } from "react"
+import ArtistsAlbums from "../../components/Artist/ArtistsAlbums"
+import ArtistsTopTracks from "../../components/Artist/ArtistsTopTracks"
+import { formatNumber } from "../../lib/Formatters/format"
+import { getColor, randomColor } from "../../lib/HelperData/HelperFunctions"
+import {
+  ArtistAlbum,
+  ArtistData,
+  PlaylistTrack,
+} from "../../lib/Interfaces/interfaces"
+import spotify from "../../lib/SpotifyApi/spotify"
+import ArtistRelatedArtists from "../../components/Artist/ArtistRelatedArtists"
+import GradientBackground from "../../components/Layout/GradientBackground"
+import Head from "next/head"
+
+const Artist = ({ color }: { color: { color: string } }) => {
+  const { data: session } = useSession()
+  const [artist, setArtist] = useState<ArtistData>()
+  const router = useRouter()
+  const artistId = router.query.artistId
+  const [artistsTopTracks, setArtistsTopTracks] = useState<PlaylistTrack[]>()
+
+  useEffect(() => {
+    ;(async () => {
+      if (session?.accessToken) {
+        await spotify
+          .getArtist(artistId, session.accessToken)
+          .then(res => setArtist(res))
+        await spotify
+          .getArtistsTopTracks(artistId, session.accessToken)
+          .then(res => setArtistsTopTracks(res.tracks))
+      }
+    })()
+  }, [session, artistId])
+
+  return (
+    <>
+      <Head>
+        <title>{artist?.name} | Spotify</title>
+      </Head>
+      {artist?.id ? (
+        <GradientBackground
+          title={artist.name}
+          type="ARTIST"
+          color={color.color}
+          imageUrl={artist.images[0]?.url}
+          roundedImage
+          artist={artist}
+        >
+          <Box position="relative" paddingY="12px" paddingBottom="40px">
+            <Text fontSize="2xl" marginBottom="30px">
+              Popular
+            </Text>
+            {artistsTopTracks && (
+              <ArtistsTopTracks topTracks={artistsTopTracks} />
+            )}
+            <Text fontSize="2xl" marginBottom="30px">
+              Albums
+            </Text>
+            <ArtistsAlbums slice={7} artistId={artistId} />
+            <Text fontSize="2xl" marginY="30px">
+              Related Artists
+            </Text>
+            <ArtistRelatedArtists artistId={artistId} />
+          </Box>
+        </GradientBackground>
+      ) : null}
+    </>
+  )
+}
+
+export default Artist
+
+export const getServerSideProps: GetServerSideProps = async (
+  context: GetServerSidePropsContext
+) => {
+  if (context.params?.artistId) {
+    const artistId = context.params.artistId
+    const color = await getColor(artistId as string)
+    return color
+  }
+
+  return {
+    props: {
+      color: undefined,
+    },
+  }
+}
