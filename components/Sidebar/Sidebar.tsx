@@ -8,7 +8,7 @@ import PlaylistMenu from "./PlaylistMenu"
 
 const imageStyles = {
   transform: "scale(1.12)",
-  marginLeft: "6px",
+  marginLeft: "8px",
 }
 
 const Sidebar = () => {

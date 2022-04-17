@@ -6,16 +6,20 @@ import { PlaylistTrack } from "../../../lib/Interfaces/interfaces"
 import Song from "../../../components/Song/Song"
 import GradientBackground from "../../../components/Layout/GradientBackground"
 import NoLikedSongs from "../../../components/Layout/NoLikedSongs"
+import Loading from "../../../components/Layout/Loading"
 
 const SavedSongs = () => {
   const { data: session } = useSession()
   const [usersSavedTracks, setUsersSavedTracks] = useState<any>()
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     ;(async () => {
       if (session?.accessToken) {
+        setLoading(true)
         const response = await spotify.getUserSavedTracks(session.accessToken)
         setUsersSavedTracks(response)
+        setLoading(true)
       }
     })()
   }, [session])
@@ -25,7 +29,7 @@ const SavedSongs = () => {
       <Head>
         <title>Liked Songs - Spotify</title>
       </Head>
-      {usersSavedTracks && session?.user?.name && (
+      {usersSavedTracks && session?.user?.name ? (
         <GradientBackground
           title="Liked Songs"
           type="PLAYLIST"
@@ -53,6 +57,8 @@ const SavedSongs = () => {
             <NoLikedSongs />
           )}
         </GradientBackground>
+      ) : (
+        <Loading />
       )}
     </>
   )

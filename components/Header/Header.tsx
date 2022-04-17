@@ -1,7 +1,6 @@
 import { Box, Flex, Text } from "@chakra-ui/layout"
 import React from "react"
 import { useSession } from "next-auth/react"
-import { useRouter } from "next/router"
 import { MdArrowDropDown, MdArrowDropUp } from "react-icons/md"
 import HeaderPopup from "./HeaderPopup"
 import { Dispatch, SetStateAction } from "react"
@@ -35,7 +34,6 @@ const Header: React.FC<Props> = ({ showPopup, setShowPopup }) => {
             <Image
               alt="User"
               src={session?.user?.image ? session.user.image : undefined}
-              _focus={{ border: "1px solid black" }}
               height="32px"
               width="32px"
               borderRadius="50%"

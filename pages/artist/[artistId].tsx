@@ -24,19 +24,29 @@ const Artist = ({ color }: { color: { color: string } }) => {
   const router = useRouter()
   const artistId = router.query.artistId
   const [artistsTopTracks, setArtistsTopTracks] = useState<PlaylistTrack[]>()
+  const [invalidId, setInvalidId] = useState(false)
 
   useEffect(() => {
     ;(async () => {
       if (session?.accessToken) {
-        await spotify
-          .getArtist(artistId, session.accessToken)
-          .then(res => setArtist(res))
+        const response = await spotify.getArtist(artistId, session.accessToken)
+        if (response?.error) {
+          setInvalidId(true)
+        } else {
+          setArtist(response)
+        }
         await spotify
           .getArtistsTopTracks(artistId, session.accessToken)
           .then(res => setArtistsTopTracks(res.tracks))
       }
     })()
   }, [session, artistId])
+
+  useEffect(() => {
+    if (invalidId) {
+      router.push("/404")
+    }
+  }, [invalidId])
 
   return (
     <>

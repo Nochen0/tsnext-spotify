@@ -15,19 +15,32 @@ const Genre = () => {
   const [categoryPlaylists, setCategoryPlaylists] =
     useState<CategoryPlaylists>()
   const [category, setCategory] = useState<Category>()
+  const [invalidId, setInvalidId] = useState(false)
 
   useEffect(() => {
     ;(async () => {
       if (session?.accessToken) {
-        await spotify
-          .getCategory(categoryId, session.accessToken)
-          .then(setCategory)
-        await spotify
-          .getCategoryPlaylists(categoryId, session.accessToken)
-          .then(setCategoryPlaylists)
+        const response = await spotify.getCategory(
+          categoryId,
+          session.accessToken
+        )
+        if (response?.error) {
+          setInvalidId(true)
+        } else {
+          setCategory(response)
+          await spotify
+            .getCategoryPlaylists(categoryId, session.accessToken)
+            .then(setCategoryPlaylists)
+        }
       }
     })()
   }, [session, categoryId])
+
+  useEffect(() => {
+    if (invalidId) {
+      router.push("/404")
+    }
+  }, [invalidId])
 
   return (
     <>
@@ -62,31 +75,34 @@ const Genre = () => {
           </Box>
         )}
         <Box paddingX="15px">
-          <Text color="white" fontSize="xl" marginY="28px">
-            Category Playlists
-          </Text>
           {categoryPlaylists?.playlists && (
-            <Flex flexWrap="wrap" gap="22px">
-              {categoryPlaylists.playlists.items.map((playlist, index) => {
-                return (
-                  <BoxWrapper
-                    imageUrl={playlist.images[0]?.url}
-                    key={index}
-                    roundedImage={false}
-                    route={`/playlist/${playlist.id}`}
-                  >
-                    <Box>
-                      <Text color="white" fontSize="sm" marginBottom="7px">
-                        {playlist.name}
-                      </Text>
-                      <Text maxW="200px" className="break" color="gray.500">
-                        {playlist.description}
-                      </Text>
-                    </Box>
-                  </BoxWrapper>
-                )
-              })}
-            </Flex>
+            <>
+              {" "}
+              <Text color="white" fontSize="xl" marginY="28px">
+                Category Playlists
+              </Text>
+              <Flex flexWrap="wrap" gap="22px">
+                {categoryPlaylists.playlists.items.map((playlist, index) => {
+                  return (
+                    <BoxWrapper
+                      imageUrl={playlist.images[0]?.url}
+                      key={index}
+                      roundedImage={false}
+                      route={`/playlist/${playlist.id}`}
+                    >
+                      <Box>
+                        <Text color="white" fontSize="sm" marginBottom="7px">
+                          {playlist.name}
+                        </Text>
+                        <Text maxW="200px" className="break" color="gray.500">
+                          {playlist.description}
+                        </Text>
+                      </Box>
+                    </BoxWrapper>
+                  )
+                })}
+              </Flex>
+            </>
           )}
         </Box>
       </Box>

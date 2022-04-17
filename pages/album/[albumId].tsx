@@ -17,19 +17,30 @@ const Album = ({ color }: { color: { color: string } }) => {
   const albumId = router.query.albumId
   const [album, setAlbum] = useState<Album>()
   const [modified, setModified] = useState<any>()
+  const [invalidId, setInvalidId] = useState(false)
 
   useEffect(() => {
     if (session?.accessToken) {
       ;(async () => {
         const response = await spotify.getAlbum(albumId, session.accessToken)
-        const _modified = response.tracks.items.map(track => {
-          return { track }
-        })
-        setModified(_modified)
-        setAlbum(response)
+        if (response?.error) {
+          setInvalidId(true)
+        } else {
+          const _modified = response.tracks.items.map(track => {
+            return { track }
+          })
+          setModified(_modified)
+          setAlbum(response)
+        }
       })()
     }
   }, [session, albumId])
+
+  useEffect(() => {
+    if (invalidId) {
+      router.push("/404")
+    }
+  }, [invalidId])
 
   return (
     <>

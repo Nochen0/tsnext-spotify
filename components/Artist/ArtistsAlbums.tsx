@@ -23,7 +23,6 @@ const ArtistsAlbums: React.FC<Props> = ({ slice, artistId, exclude }) => {
           session.accessToken
         )
         if (exclude) {
-          console.log(response.items)
           setAlbums(response.items.filter((item: any) => item.id !== exclude))
         } else {
           setAlbums(response.items)
