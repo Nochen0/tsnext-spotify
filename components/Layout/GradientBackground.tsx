@@ -12,14 +12,14 @@ import SongIndicator from "../Song/SongIndicator"
 import { formatNumber } from "../../lib/Formatters/format"
 
 type Props = {
-  color?: string
+  color: string
   playlist?: Playlist | Track[] | PlaylistTrack[] | []
   album?: Album
   children: React.ReactNode
   explicitColor?: string
   description?: string
   imageUrl: string
-  noIndicator?: boolean
+  noIndicator?: true
   type: string
   title: string
   owner?: string
