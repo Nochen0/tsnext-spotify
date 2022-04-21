@@ -6,7 +6,12 @@ import { useEffect, useState } from "react"
 import ArtistsAlbums from "../../components/Artist/ArtistsAlbums"
 import ArtistsTopTracks from "../../components/Artist/ArtistsTopTracks"
 import { getColor } from "../../lib/HelperData/HelperFunctions"
-import { Artist, PlaylistTrack } from "../../lib/Interfaces/interfaces"
+import {
+  Artist,
+  ArtistRelatedArtists as RelatedArtists,
+  ArtistsAlbums as ArtistAlbums,
+  PlaylistTrack,
+} from "../../lib/Interfaces/interfaces"
 import spotify from "../../lib/SpotifyApi/spotify"
 import ArtistRelatedArtists from "../../components/Artist/ArtistRelatedArtists"
 import GradientBackground from "../../components/Layout/GradientBackground"
@@ -18,20 +23,29 @@ const Artist = ({ color }: { color: { color: string } }) => {
   const router = useRouter()
   const artistId = router.query.artistId
   const [artistsTopTracks, setArtistsTopTracks] = useState<PlaylistTrack[]>()
+  const [artistRelatedArtists, setArtistRelatedArtists] =
+    useState<RelatedArtists>()
   const [invalidId, setInvalidId] = useState(false)
+  const [artistAlbums, setArtistAlbums] = useState<ArtistAlbums>()
 
   useEffect(() => {
     ;(async () => {
       if (session?.accessToken) {
-        const response = await spotify.getArtist(artistId, session.accessToken)
-        if (response?.error) {
+        const [artistRes, topTracks, artistsAlbums, relatedArtists] =
+          await Promise.all([
+            spotify.getArtist(artistId, session.accessToken),
+            spotify.getArtistsTopTracks(artistId, session.accessToken),
+            spotify.getArtistsAlbums(artistId, session.accessToken),
+            spotify.getArtistRelatedArtists(artistId, session.accessToken),
+          ])
+        if (artistRes?.error) {
           setInvalidId(true)
         } else {
-          setArtist(response)
+          setArtist(artistRes)
+          setArtistsTopTracks(topTracks.tracks)
+          setArtistAlbums(artistsAlbums)
+          setArtistRelatedArtists(relatedArtists)
         }
-        await spotify
-          .getArtistsTopTracks(artistId, session.accessToken)
-          .then(res => setArtistsTopTracks(res.tracks))
       }
     })()
   }, [session, artistId])
@@ -66,11 +80,22 @@ const Artist = ({ color }: { color: { color: string } }) => {
             <Text fontSize="2xl" marginBottom="30px">
               Albums
             </Text>
-            <ArtistsAlbums slice={7} artistId={artistId} />
+            {artistAlbums && (
+              <ArtistsAlbums
+                slice={7}
+                artistId={artistId}
+                albums={artistAlbums}
+              />
+            )}
             <Text fontSize="2xl" marginY="30px">
               Related Artists
             </Text>
-            <ArtistRelatedArtists artistId={artistId} />
+            {artistRelatedArtists && (
+              <ArtistRelatedArtists
+                artistId={artistId}
+                artists={artistRelatedArtists.artists}
+              />
+            )}
           </Box>
         </GradientBackground>
       ) : null}

@@ -38,6 +38,7 @@ const BoxWrapper: React.FC<Props> = ({
       padding="12px"
       borderRadius="6px"
       width={width ? width : 195}
+      minW="200px"
       position="relative"
       height={
         paddingBottom
@@ -49,6 +50,7 @@ const BoxWrapper: React.FC<Props> = ({
           : 260
       }
       transitionDuration="400ms"
+      transitionProperty="background"
       _hover={{ background: "rgba(255, 255, 255, .1)" }}
       className="break"
       cursor="pointer"

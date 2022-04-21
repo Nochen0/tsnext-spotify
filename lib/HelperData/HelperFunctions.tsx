@@ -55,3 +55,7 @@ export const getColor = async (id: string) => {
     }
   }
 }
+
+export const dynamicSlice = (width: number, itemWidth: number) => {
+  return Math.floor((width - 260) / itemWidth)
+}

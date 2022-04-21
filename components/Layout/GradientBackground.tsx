@@ -104,6 +104,7 @@ const GradientBackground: React.FC<Props> = ({
                 }
                 fontWeight="700"
                 maxW="40ch"
+                marginRight="40px"
                 className="break"
               >
                 {title}

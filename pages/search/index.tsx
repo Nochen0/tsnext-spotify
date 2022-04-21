@@ -1,5 +1,5 @@
 import { Box, Flex, Text } from "@chakra-ui/layout"
-import { Icon, IconButton, Input } from "@chakra-ui/react"
+import { calc, Icon, IconButton, Input } from "@chakra-ui/react"
 import { useSession } from "next-auth/react"
 import Head from "next/head"
 import { useEffect, useState } from "react"
@@ -15,14 +15,20 @@ import BoxWrapper from "../../components/Layout/BoxWrapper"
 import Song from "../../components/Song/Song"
 import { MdClose, MdPlayCircleFilled, MdSearch } from "react-icons/md"
 import Browse from "../../components/Search/Browse"
+import { dynamicSlice } from "../../lib/HelperData/HelperFunctions"
 
 const Home = () => {
+  const [windowW, setWindowW] = useState(window.innerWidth)
   const [inputValue, setInputValue] = useState<string>("")
   const { data: session } = useSession()
   const [albums, setAlbums] = useState<SearchAlbum[]>()
   const [artists, setArtists] = useState<SearchArtist[]>()
   const [playlists, setPlaylists] = useState<SearchPlaylist[]>()
   const [tracks, setTracks] = useState<{ track: Track }[]>()
+
+  const handleResize = () => {
+    setWindowW(window.innerWidth)
+  }
 
   useEffect(() => {
     ;(async () => {
@@ -40,6 +46,14 @@ const Home = () => {
       }
     })()
   }, [inputValue, session])
+
+  useEffect(() => {
+    window.addEventListener("resize", handleResize)
+
+    return () => {
+      window.removeEventListener("resize", handleResize)
+    }
+  }, [])
 
   return (
     <>
@@ -113,7 +127,7 @@ const Home = () => {
                       roundedImage
                       imageUrl={tracks[0]?.track?.album?.images[0].url}
                       height={200}
-                      width={450}
+                      width={"calc((100vw - 260px) / 100 * 30)"}
                       external
                       paddingBottom={-65}
                       route={`/artist/${tracks[0]?.track.artists[0].id}`}
@@ -149,8 +163,8 @@ const Home = () => {
                 </Box>
               )}
               {tracks !== undefined && tracks?.length > 0 && (
-                <Box width="66%" minW="650px">
-                  <Text fontSize="2xl" marginBottom="20px">
+                <Box width="66%" minW="650px" marginLeft="25px">
+                  <Text fontSize="2xl" marginBottom="20px" marginLeft="20px">
                     Songs
                   </Text>
                   <Box>
@@ -176,26 +190,32 @@ const Home = () => {
                   Artists
                 </Text>
                 <Flex flexWrap="wrap" gap="25px">
-                  {artists?.slice(0, 7).map((artist, index) => {
-                    return (
-                      <BoxWrapper
-                        key={index}
-                        roundedImage
-                        imageUrl={artist.image}
-                        route={`/artist/${artist.id}`}
-                        height={220}
-                        width={200}
-                        paddingBottom={-30}
-                      >
-                        <Box>
-                          <Text fontSize="md">{artist.name}</Text>
-                          <Text fontWeight="500" color="gray.400" fontSize="sm">
-                            Artist
-                          </Text>
-                        </Box>
-                      </BoxWrapper>
-                    )
-                  })}
+                  {artists
+                    ?.slice(0, dynamicSlice(windowW, 230))
+                    .map((artist, index) => {
+                      return (
+                        <BoxWrapper
+                          key={index}
+                          roundedImage
+                          imageUrl={artist.image}
+                          route={`/artist/${artist.id}`}
+                          height={220}
+                          width={200}
+                          paddingBottom={-30}
+                        >
+                          <Box>
+                            <Text fontSize="md">{artist.name}</Text>
+                            <Text
+                              fontWeight="500"
+                              color="gray.400"
+                              fontSize="sm"
+                            >
+                              Artist
+                            </Text>
+                          </Box>
+                        </BoxWrapper>
+                      )
+                    })}
                 </Flex>
               </Box>
             )}
@@ -205,23 +225,25 @@ const Home = () => {
                   Albums
                 </Text>
                 <Flex flexWrap="wrap" gap="25px">
-                  {albums?.slice(0, 7).map((album, index) => {
-                    return (
-                      <BoxWrapper
-                        key={index}
-                        imageUrl={album.image}
-                        roundedImage={false}
-                        route={`/album/${album.id}`}
-                        height={220}
-                        width={200}
-                        paddingBottom={-5}
-                      >
-                        <Text fontWeight="500" color="gray.400" fontSize="sm">
-                          {album.release_date.substring(0, 4)} · Album
-                        </Text>
-                      </BoxWrapper>
-                    )
-                  })}
+                  {albums
+                    ?.slice(0, dynamicSlice(windowW, 230))
+                    .map((album, index) => {
+                      return (
+                        <BoxWrapper
+                          key={index}
+                          imageUrl={album.image}
+                          roundedImage={false}
+                          route={`/album/${album.id}`}
+                          height={220}
+                          width={200}
+                          paddingBottom={-5}
+                        >
+                          <Text fontWeight="500" color="gray.400" fontSize="sm">
+                            {album.release_date.substring(0, 4)} · Album
+                          </Text>
+                        </BoxWrapper>
+                      )
+                    })}
                 </Flex>
               </Box>
             )}
@@ -231,23 +253,25 @@ const Home = () => {
                   Playlists
                 </Text>
                 <Flex flexWrap="wrap" gap="25px">
-                  {playlists?.slice(0, 7).map((playlist, index) => {
-                    return (
-                      <BoxWrapper
-                        key={index}
-                        imageUrl={playlist.image}
-                        roundedImage={false}
-                        route={`/album/${playlist.id}`}
-                        height={220}
-                        width={200}
-                        paddingBottom={-5}
-                      >
-                        <Text fontWeight="500" color="gray.400" fontSize="sm">
-                          By {playlist.owner}
-                        </Text>
-                      </BoxWrapper>
-                    )
-                  })}
+                  {playlists
+                    ?.slice(0, dynamicSlice(windowW, 230))
+                    .map((playlist, index) => {
+                      return (
+                        <BoxWrapper
+                          key={index}
+                          imageUrl={playlist.image}
+                          roundedImage={false}
+                          route={`/album/${playlist.id}`}
+                          height={220}
+                          width={200}
+                          paddingBottom={-5}
+                        >
+                          <Text fontWeight="500" color="gray.400" fontSize="sm">
+                            By {playlist.owner}
+                          </Text>
+                        </BoxWrapper>
+                      )
+                    })}
                 </Flex>
               </Box>
             )}

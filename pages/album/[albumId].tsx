@@ -8,7 +8,10 @@ import ArtistsAlbums from "../../components/Artist/ArtistsAlbums"
 import GradientBackground from "../../components/Layout/GradientBackground"
 import Song from "../../components/Song/Song"
 import { getColor } from "../../lib/HelperData/HelperFunctions"
-import { Album } from "../../lib/Interfaces/interfaces"
+import {
+  Album,
+  ArtistsAlbums as ArtistAlbums,
+} from "../../lib/Interfaces/interfaces"
 import spotify from "../../lib/SpotifyApi/spotify"
 
 const Album = ({ color }: { color: { color: string } }) => {
@@ -18,19 +21,28 @@ const Album = ({ color }: { color: { color: string } }) => {
   const [album, setAlbum] = useState<Album>()
   const [modified, setModified] = useState<any>()
   const [invalidId, setInvalidId] = useState(false)
+  const [artistAlbums, setArtistAlbums] = useState<ArtistAlbums>()
 
   useEffect(() => {
     if (session?.accessToken) {
       ;(async () => {
-        const response = await spotify.getAlbum(albumId, session.accessToken)
-        if (response?.error) {
+        const albumResponse = await spotify.getAlbum(
+          albumId,
+          session.accessToken
+        )
+        if (albumResponse?.error) {
           setInvalidId(true)
         } else {
-          const _modified = response.tracks.items.map(track => {
+          const _modified = albumResponse.tracks.items.map(track => {
             return { track }
           })
           setModified(_modified)
-          setAlbum(response)
+          setAlbum(albumResponse)
+          const artistAlbums = await spotify.getArtistsAlbums(
+            albumResponse.artists[0].id,
+            session.accessToken
+          )
+          setArtistAlbums(artistAlbums)
         }
       })()
     }
@@ -73,11 +85,12 @@ const Album = ({ color }: { color: { color: string } }) => {
             More by {album.artists[0].name}
           </Text>
           <Box marginBottom="45px">
-            {album?.artists && (
+            {album?.artists && artistAlbums && (
               <ArtistsAlbums
                 slice={7}
                 artistId={album.artists[0].id}
                 exclude={album.id}
+                albums={artistAlbums}
               />
             )}
           </Box>
