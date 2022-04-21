@@ -34,8 +34,8 @@ const Browse = () => {
               key={index}
               position="relative"
               onClick={() => router.push(`/genre/${category.id}`)}
-              height="190px"
-              width="190px"
+              height="calc(100vw / 100 * 10)"
+              width="calc(100vw / 100 * 10)"
               borderRadius="10px"
               bg={randomColor()}
               overflow="hidden"

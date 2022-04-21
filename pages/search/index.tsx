@@ -118,7 +118,7 @@ const Home = () => {
           <>
             <Flex flexWrap="wrap">
               {tracks !== undefined && tracks?.length > 0 && (
-                <Box height="240px" width="30%" marginBottom="100px">
+                <Box height="240px" width="25%" marginBottom="100px">
                   <Text fontSize="2xl" marginBottom="20px">
                     Top result
                   </Text>
@@ -127,7 +127,7 @@ const Home = () => {
                       roundedImage
                       imageUrl={tracks[0]?.track?.album?.images[0].url}
                       height={200}
-                      width={"calc((100vw - 260px) / 100 * 30)"}
+                      width={"calc((100vw - 260px) / 100 * 25)"}
                       external
                       paddingBottom={-65}
                       route={`/artist/${tracks[0]?.track.artists[0].id}`}
@@ -261,7 +261,7 @@ const Home = () => {
                           key={index}
                           imageUrl={playlist.image}
                           roundedImage={false}
-                          route={`/album/${playlist.id}`}
+                          route={`/playlist/${playlist.id}`}
                           height={220}
                           width={200}
                           paddingBottom={-5}
