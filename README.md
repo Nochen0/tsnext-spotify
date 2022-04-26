@@ -1,4 +1,4 @@
-[ss]: https://user-images.githubusercontent.com/71450603/163694344-2513b80f-7905-4084-b16f-85abd099f558.png "Logo Title Text 2"
+[ss]: 
 
 ![alt text][ss]
 
