@@ -1,169 +1,94 @@
-export interface Image {
-  height: number
-  url: string
-  width: number
+interface Image {
+  height: any;
+  url: string;
+  width: any;
 }
 
-export interface UserPlaylist {
-  description: string
-  id: string
-  images: Image[]
-  name: string
+interface UserPlaylist {
+  description: string;
+  id: string;
+  images: Image[];
+  name: string;
   owner: {
-    display_name: string
-    id: string
-  }
-  tracks: { total: number }
-  type: string
+    display_name: string;
+    id: string;
+  };
+  tracks: {
+    total: number;
+  };
 }
 
-interface _Artist {
-  id: string
-  name: string
-  type: string
+interface Artist {
+  id: string;
+  name: string;
+}
+
+interface TrackAlbum {
+  album_type: string
+  artists: Artist[];
+  id: string;
+  images: Image[];
+  name: string;
+  release_date: string;
+}
+
+interface AlbumTrack {
+  artists: Artist[];
+  duration_ms: number
+  id: string;
+  name: string;
 }
 
 export interface Track {
-  album?: _Album
-  artists: _Artist[]
-  duration_ms: number
-  id: string
-  name: string
-  type: string
+  album: TrackAlbum;
+  artists: Artist[];
+  duration_ms: number;
+  id: string;
+  name: string;
 }
 
 export interface PlaylistTrack {
-  added_at: string
-  track: Track
+  added_at?: string;
+  track: Track;
+}
+
+export interface UserPlaylists {
+  items: UserPlaylist[];
 }
 
 export interface Playlist extends UserPlaylist {
-  followers: {
-    total: number
-  }
   tracks: {
-    items: PlaylistTrack[]
-    total: number
-  }
+    items: PlaylistTrack[];
+    total: number;
+  };
 }
 
-export interface SavedTracks {
-  items: PlaylistTrack[] | []
-  total: number
-}
-
-export interface Artist {
+export interface ExternalArtist extends Artist {
   followers: {
-    total: number
-  }
-  genres: string[] | []
-  id: string
-  images: Image[]
-  name: string
-  type: string
-  popularity: number
+    total: number;
+  };
+  genres: any[];
+  images: Image[];
 }
 
 export interface ArtistsTopTracks {
-  tracks: PlaylistTrack[]
-}
-
-export interface _Album {
-  artists: _Artist[]
-  id: string
-  images: Image[]
-  name: string
-  release_date: string
-  total_tracks: number
-  type: string
-}
-
-export interface ArtistsAlbums {
-  items: _Album[]
-  total: number
+  tracks: Track[];
 }
 
 export interface ArtistRelatedArtists {
-  artists: Artist[]
+  artists: ExternalArtist[];
 }
 
-export interface Album extends _Album {
-  copyrights: string[] | []
+export interface ArtistsAlbums {
+  items: TrackAlbum[];
+}
+
+export interface Album extends TrackAlbum {
+  copyrights: {text:string; type: string}[]
+  genres: any[] 
   label: string
+  total_tracks: number
   tracks: {
-    items: PlaylistTrack[]
-    total: number
-  }
-}
-
-export interface SearchAlbum {
-  id: string
-  image: string
-  name: string
-  release_date: string
-}
-
-export interface SearchArtist {
-  followers: number
-  genres: string
-  id: string
-  image: string
-  name: string
-  popularity: number
-}
-
-export interface SearchPlaylist {
-  description: string
-  id: string
-  image: string
-  name: string
-  owner: string
-  ownerId: string
-}
-
-export interface SearchTrack {
-  track: Track
-}
-
-export interface SearchI {
-  albums: {
-    items: _Album[]
-  }
-  artists: {
-    items: Artist[]
-  }
-  playlists: {
-    items: UserPlaylist[]
-  }
-  tracks: {
-    items: Track[]
-  }
-}
-
-export interface Category {
-  href: string
-  icons: Image[]
-  id: string
-  name: string
-}
-
-export interface Categories {
-  categories: {
-    items: Category[]
-    total: number
-  }
-}
-
-export interface CategoryPlaylists {
-  playlists: {
-    items: UserPlaylist[]
-    total: number
-  }
-}
-
-export interface Error {
-  error: {
-    status: number
-    message: string
+    items: AlbumTrack[]
   }
 }
