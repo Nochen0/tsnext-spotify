@@ -4,7 +4,8 @@
 
 ## Installation
 
-Enter your Spotify API Client ID and Client Secret in .env file and add redirect uri in spotify api console and change NEXTAUTH_URL in .env file with your redirect uri.
+Enter your Spotify API Client ID and Client Secret in .env file and add redirect uri in spotify api console and change NEXTAUTH_URL in .env file with your
+localhost port.
 
 ```
 git clone https://github.com/Nochen0/tsnext-spotify.git
