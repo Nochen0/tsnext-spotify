@@ -9,12 +9,18 @@ Enter your Spotify API Client ID and Client Secret in .env file and add redirect
 ```
 git clone https://github.com/Nochen0/tsnext-spotify.git
 cd tsnext-spotify
-npm install
-npm run dev or,
+```
 
+```
+npm install
+npm run dev
+```
+
+```
+or
+```
 yarn install
 yarn dev
-
 ```
 
 ## Description
