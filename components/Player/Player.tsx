@@ -1,108 +1,98 @@
-import { Box } from "@chakra-ui/layout"
-import { ButtonGroup } from "@chakra-ui/react"
-import { useEffect, useRef, useState } from "react"
-import { patchUrl } from "../../store/player-reducer"
-import { useAppDispatch, useAppSelector } from "../../store/store"
-import ReactPlayer from "react-player"
-import IconButtons from "./IconButtons"
-import PlayerSeekbar from "./PlayerSeekbar"
-import { PlaylistTrack } from "../../lib/Interfaces/interfaces"
+import { Box, ButtonGroup } from "@chakra-ui/react";
+import React, { useEffect, useRef, useState } from "react";
+import ReactPlayer from "react-player/youtube";
+import { PlaylistTrack, Track } from "../../lib/Interfaces/interfaces";
+import { getSongUrl, setPlaying } from "../../store/player-reducer";
+import { useAppDispatch, useAppSelector } from "../../store/store";
+import IconButtons from "./IconButtons";
+import PlayerSeekbar from "./PlayerSeekbar";
 
 type Progress = {
-  loaded: number
-  loadedSeconds: number
-  played: number
-  playedSeconds: number
-}
+  loaded: number;
+  loadedSeconds: number;
+  played: number;
+  playedSeconds: number;
+};
 
-const Player = () => {
-  const {
-    activeSongs: songs,
-    activeSong,
-    playing,
-    volume,
-  } = useAppSelector(state => state.slice)
-  const dispatch = useAppDispatch()
-  const [shuffle, setShuffle] = useState(false)
-  const [repeat, setRepeat] = useState(false)
-  const [isClient, setIsClient] = useState(false)
-  const [playedSeconds, setPlayedSeconds] = useState(0.0)
-  const [isSeeking, setIsSeeking] = useState(false)
-  const [duration, setDuration] = useState(0.0)
-  const soundRef = useRef<any>()
+type Props = {
+  activeSong: { url: string; track: Track };
+  activeSongs: any[];
+};
+
+const Player: React.FC<Props> = ({ activeSong, activeSongs }): any => {
+  const [isClient, setIsClient] = useState(false);
+  const soundRef = useRef<any>();
+  const { playing } = useAppSelector((state) => state.playerSlice);
+  const [duration, setDuration] = useState(0.0);
+  const [loop, setLoop] = useState(false);
+  const [isSeeking, setIsSeeking] = useState(false);
+  const [playedSeconds, setPlayedSeconds] = useState(0.0);
+  const [shuffle, setShuffle] = useState(false);
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      setIsClient(true)
+      setIsClient(true);
     }
-  }, [])
+  }, []);
 
-  const finder = (item: PlaylistTrack) => item === activeSong.track
-
-  const onShuffle = () => {
-    setShuffle(prev => !prev)
-  }
-
-  const onRepeat = () => {
-    setRepeat(prev => !prev)
-  }
-
-  const prevSong = () => {
-    const index = songs.findIndex(finder)
-
-    if (index - 1 >= 0) {
-      dispatch(patchUrl(songs[index - 1], songs))
-    } else {
-      soundRef.current.seekTo(0)
-    }
-  }
-
-  const nextSong = (): any => {
-    const index = songs.findIndex(finder)
-
-    if (songs.length > 1) {
-      if (shuffle) {
-        const randomIndex = Math.floor(Math.random() * songs.length)
-        if (randomIndex === index) {
-          return nextSong()
-        } else {
-          dispatch(patchUrl(songs[randomIndex], songs))
-        }
-      } else {
-        let index = songs.findIndex(finder)
-
-        if (index === -1) {
-          index = songs.findIndex(item => item === activeSong.track)
-        }
-
-        if (index + 1 < songs.length) {
-          dispatch(patchUrl(songs[index + 1], songs))
-        } else {
-          const randomIndex = Math.floor(Math.random() * songs.length)
-          if (randomIndex === index) {
-            return nextSong()
-          } else {
-            dispatch(patchUrl(songs[randomIndex], songs))
-          }
-        }
-      }
-    }
-  }
+  const finder = (item: PlaylistTrack) => item.track === activeSong.track;
 
   const onProgress = (e: Progress) => {
     if (!isSeeking) {
-      setPlayedSeconds(e.playedSeconds)
+      setPlayedSeconds(e.playedSeconds);
     }
-  }
+  };
+
+  const prevSong = () => {
+    const index = activeSongs.findIndex(finder);
+
+    if (index - 1 >= 0) {
+      dispatch(getSongUrl(activeSongs[index - 1].track, activeSongs));
+    } else {
+      soundRef.current.seekTo(0);
+    }
+  };
+
+  const nextSong = (): any => {
+    const index = activeSongs.findIndex(finder);
+
+    if (activeSongs.length > 1) {
+      if (shuffle) {
+        const randomIndex = Math.floor(Math.random() * activeSongs.length);
+
+        if (randomIndex === index) {
+          return nextSong();
+        } else {
+          dispatch(getSongUrl(activeSongs[randomIndex].track, activeSongs));
+        }
+      } else {
+        let index = activeSongs.findIndex(finder);
+
+        if (index + 1 < activeSongs.length) {
+          dispatch(getSongUrl(activeSongs[index + 1].track, activeSongs));
+        } else {
+          const randomIndex = Math.floor(Math.random() * activeSongs.length);
+          if (randomIndex === index) {
+            return nextSong();
+          } else {
+            dispatch(getSongUrl(activeSongs[randomIndex].track, activeSongs));
+          }
+        }
+      }
+    } else {
+      dispatch(setPlaying(false))
+    }
+  };
 
   const onEnded = () => {
-    if (repeat) {
-      soundRef.current.seekTo(0)
-      setPlayedSeconds(0)
+    if (loop) {
+      soundRef.current.seekTo(0);
+      setPlayedSeconds(0);
     } else {
-      nextSong()
+      nextSong();
     }
-  }
+  };
 
   return (
     <Box>
@@ -113,9 +103,9 @@ const Player = () => {
           playing={playing}
           width="0px"
           style={{ position: "absolute" }}
-          volume={volume / 100}
+          volume={1}
           onDuration={setDuration}
-          loop={repeat}
+          loop={loop}
           onProgress={onProgress}
           onEnded={onEnded}
           playedSeconds={playedSeconds}
@@ -123,16 +113,16 @@ const Player = () => {
       )}
       <ButtonGroup display="flex" alignItems="center" justifyContent="center">
         <IconButtons
-          repeat={repeat}
+          loop={loop}
           shuffle={shuffle}
-          onRepeat={onRepeat}
-          onShuffle={onShuffle}
+          setLoop={setLoop}
+          setShuffle={setShuffle}
           prevSong={prevSong}
           nextSong={nextSong}
         />
       </ButtonGroup>
       <PlayerSeekbar
-        playedseconds={playedSeconds}
+        playedSeconds={playedSeconds}
         soundRef={soundRef}
         isSeeking={isSeeking}
         setIsSeeking={setIsSeeking}
@@ -140,6 +130,7 @@ const Player = () => {
         setPlayedSeconds={setPlayedSeconds}
       />
     </Box>
-  )
-}
-export default Player
+  );
+};
+
+export default Player;

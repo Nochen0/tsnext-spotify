@@ -1,17 +1,12 @@
-import { Box, Grid } from "@chakra-ui/layout"
-import { Button } from "@chakra-ui/react"
-import Head from "next/head"
-import { signIn, useSession } from "next-auth/react"
-import Image from "next/image"
-import Loading from "../Layout/Loading"
+import { Box, Button, Grid } from "@chakra-ui/react";
+import { signIn } from "next-auth/react";
+import Head from "next/head";
+import Image from "next/image";
+import React from "react";
 
 const Login = () => {
-  const { data: session } = useSession()
-
-  if (session) return <Loading />
-
   return (
-    <Grid bg="black" height="100vh" placeItems="center">
+    <Grid placeItems="center" h="100vh" w="100vw" bg="black">
       <Head>
         <title>Login - Spotify</title>
       </Head>
@@ -34,6 +29,7 @@ const Login = () => {
         </Button>
       </Box>
     </Grid>
-  )
-}
-export default Login
+  );
+};
+
+export default Login;

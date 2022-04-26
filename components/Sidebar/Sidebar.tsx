@@ -1,47 +1,37 @@
-import { Box, Divider } from "@chakra-ui/layout"
-import Image from "next/image"
-import { useRouter } from "next/router"
-import SpotifyIcon from "../../public/spotify2019-830x350.jpg"
-import MusicMenu from "./MusicMenu"
-import NavMenu from "./NavMenu"
-import PlaylistMenu from "./PlaylistMenu"
-
-const imageStyles = {
-  transform: "scale(1.12)",
-  marginLeft: "8px",
-}
+import { Box, Divider } from "@chakra-ui/react";
+import Image from "next/image";
+import { useRouter } from "next/router";
+import React from "react";
+import MusicMenu from "./MusicMenu";
+import NavMenu from "./NavMenu";
+import PlaylistMenu from "./PlaylistMenu";
 
 const Sidebar = () => {
-  const router = useRouter()
+  const router = useRouter();
+
+  const handleSpotifyClick = () => {
+    router.push("/");
+  };
 
   return (
-    <Box height="100%" bg="black" paddingTop="16px">
-      <Box
-        width="150px"
-        paddingLeft="16px"
-        cursor="pointer"
-        marginBottom="24px"
-      >
+    <Box h="100%">
+      <Box marginBottom="20px" cursor="pointer" display="inline-block" onClick={handleSpotifyClick}>
         <Image
-          src={SpotifyIcon}
-          alt="Spotify Icon"
-          style={imageStyles}
-          onClick={() => router.push("/")}
+          alt="Spotify Logo"
+          src="https://rb.gy/y9mwtb"
+          width="150px"
+          height="65px"
+          draggable={false}
         />
       </Box>
-      <Box
-        height="calc(100% - 100px)"
-        paddingX="22px"
-        position="relative"
-        top="-7px"
-      >
+      <Box overflowY="auto">
         <NavMenu />
         <MusicMenu />
-        <Divider marginY="12px" />
+        <Divider h="0.1px" color="gray.400" marginY="12px" />
         <PlaylistMenu />
       </Box>
     </Box>
-  )
-}
+  );
+};
 
-export default Sidebar
+export default Sidebar;

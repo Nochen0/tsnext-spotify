@@ -1,64 +1,57 @@
-import { Box, Flex, Text, Link as ChakraLink } from "@chakra-ui/layout"
-import { Image } from "@chakra-ui/react"
-import Link from "next/link"
-import { useAppSelector } from "../../store/store"
-import Player from "./Player"
-import VolumeControls from "./VolumeControls"
+import { Box, Flex, Image, Text } from "@chakra-ui/react";
+import { useRouter } from "next/router";
+import React from "react";
+import { useAppSelector } from "../../store/store";
+import Player from "./Player";
 
 const PlayerBar = () => {
-  const activeSong = useAppSelector(state => state.slice.activeSong)
+  const router = useRouter();
+  const { activeSong, activeSongs } = useAppSelector((state) => state.playerSlice);
 
   return (
-    <Flex bg="#181818" height="100%" align="center" gap="50px" paddingX="15px">
-      <Flex width="25%" gap="12px" minW="250px" align="center">
+    <Flex bg="#181818" height="100%" align="center" paddingX="15px">
+      <Flex width="28%" gap="14px" minW="250px" align="center">
+        {activeSong?.track?.album?.images && (
+          <Image alt="Album Image" h="55px" src={activeSong.track.album.images[0].url} />
+        )}
         {activeSong?.url && (
-          <>
-            {activeSong.track?.track?.album?.images && (
-              <Box height="50px" width="50px" minW="49px" minH="49px">
-                <Image
-                  alt="Album Icon"
-                  src={activeSong.track.track.album.images[0].url}
-                />
-              </Box>
-            )}
-
-            <Box fontWeight="500">
-              <Text color="white" fontSize="sm">
-                {activeSong.track?.track?.name}
-              </Text>
-              <Text color="gray.400" fontWeight="400" fontSize="xs">
-                <Link
-                  passHref
-                  href={`/artist/${activeSong.track?.track?.artists[0]?.id}`}
-                >
-                  <ChakraLink
-                    color="gray.400"
-                    fontWeight="400"
-                    textUnderlineOffset="1px"
-                    _hover={{ textDecoration: "underline", color: "white" }}
-                    _focus={{ boxShadow: "0px" }}
-                  >
-                    {activeSong.track?.track?.artists[0].name}
-                  </ChakraLink>
-                </Link>
-              </Text>
-            </Box>
-          </>
+          <Box>
+            <Text color="white" fontSize="14px">
+              {activeSong.track.name}
+            </Text>
+            <Text
+              color="gray.500"
+              cursor="pointer"
+              fontWeight="500"
+              textUnderlineOffset={1}
+              _hover={{ color: "white", textDecoration: "underline" }}
+              onClick={() => router.push(`/artist/${activeSong.track.artists[0].id}`)}
+            >
+              {activeSong.track.artists[0].name}
+            </Text>
+          </Box>
         )}
       </Flex>
+
       <Box
         width="50%"
-        style={!activeSong?.url ? { pointerEvents: "none" } : {}}
         cursor="pointer"
         minW="350px"
+        pointerEvents={activeSong?.url ? "all" : "none"}
       >
-        <Player />
+        <Player activeSong={activeSong} activeSongs={activeSongs} />
       </Box>
-      <Flex align="center" width="25%" justify="end" paddingRight="28px">
-        {activeSong?.url && <VolumeControls />}
+      <Flex
+        width="25%"
+        gap="12px"
+        align="center"
+        justify="end"
+        pointerEvents={activeSong?.url ? "all" : "none"}
+      >
+        Volume Controls
       </Flex>
     </Flex>
-  )
-}
+  );
+};
 
-export default PlayerBar
+export default PlayerBar;

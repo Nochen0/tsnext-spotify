@@ -1,159 +1,90 @@
-import { Box, Flex, Text } from "@chakra-ui/layout"
-import React from "react"
-import {
-  Album,
-  Artist,
-  Playlist,
-  PlaylistTrack,
-  Track,
-} from "../../lib/Interfaces/interfaces"
-import { Image, useMediaQuery } from "@chakra-ui/react"
-import SongIndicator from "../Song/SongIndicator"
-import { formatNumber } from "../../lib/Formatters/format"
+import { Box, Flex, Heading, Image, Text, useMediaQuery } from "@chakra-ui/react";
+import React from "react";
 
 type Props = {
-  color: string
-  playlist?: Playlist | Track[] | PlaylistTrack[] | []
-  album?: Album
-  children: React.ReactNode
-  explicitColor?: string
-  description?: string
-  imageUrl: string
-  noIndicator?: true
-  type: string
-  title: string
-  owner?: string
-  roundedImage?: true
-  artist?: Artist
-}
+  color: string;
+  image: string;
+  type: "album" | "playlist" | "artist" | "single";
+  title: string;
+  description?: string;
+  children: React.ReactNode;
+  extraText?: React.ReactNode;
+  roundedImage?: true;
+};
 
 const GradientBackground: React.FC<Props> = ({
   color,
-  playlist,
-  children,
-  explicitColor,
+  extraText,
+  image,
   type,
-  imageUrl,
-  artist,
   title,
   description,
+  children,
   roundedImage,
-  noIndicator,
-  album,
-  owner,
 }) => {
-  const [isLargerThan1280] = useMediaQuery("(min-width: 1280px)")
+  const [isLargerThan2000] = useMediaQuery("(min-width: 2000px)");
 
   return (
-    <Box
-      height="calc(100vh - 92px)"
-      overflowY="auto"
-      color="white"
-      paddingX="20px"
-      minW="600px"
-      overflowX="hidden"
-      position="relative"
-      bg="#121212"
-    >
+    <Box minH="calc(100vh - 92px)" overflowY="auto" position="relative" bg="#121212" minW="650px">
       <Box
         position="absolute"
-        bgGradient={
-          !explicitColor
-            ? `linear(${color} 0%, ${color} 20%, ${color} 35%, #121212 75%)`
-            : `linear(${explicitColor} -10%, ${explicitColor} 20%, ${explicitColor} 40%, #121212 75%)`
-        }
+        bgGradient={`linear(${color} 0%, ${color} 20%, ${color} 20%, #121212 80%)`}
         top="0"
         left="0"
         right="0"
-        height="600px"
+        h="60vh"
         zIndex="0"
-        className="unselectable"
       ></Box>
       <Flex
-        height="330px"
+        minH="320px"
+        h="31vh"
         align="end"
-        paddingBottom="13px"
-        marginBottom="25px"
+        position="relative"
+        paddingX="32px"
+        paddingY="28px"
+        gap="24px"
         className="unselectable"
       >
-        <Flex height="200px" zIndex="99" align="end">
+        <Box>
           <Image
-            src={imageUrl}
-            alt="Image"
-            height="235px"
-            width="235px"
+            alt={`${type} image`}
+            src={image}
+            h={roundedImage ? "250px" : "200px"}
+            w={roundedImage ? "250px" : "200px"}
+            draggable={false}
             borderRadius={roundedImage ? "50%" : "0"}
           />
-          <Flex align="end">
-            <Box
-              width="calc(100vw - 492px)"
-              minW="400px"
-              paddingLeft="28px"
-              paddingY={roundedImage ? "20px" : "0"}
-            >
-              <Text fontWeight="500" marginBottom="-8px" fontSize="14px">
-                {type}
-              </Text>
-              <Text
-                fontSize={
-                  isLargerThan1280
-                    ? title.length < 25
-                      ? "85px"
-                      : "60px"
-                    : "60px"
-                }
-                fontWeight="700"
-                maxW="40ch"
-                marginRight="40px"
-                className="break"
-              >
-                {title}
-              </Text>
-              <Text
-                marginBottom="7px"
-                color="gray.400"
-                fontWeight="400"
-                fontSize="15px"
-              >
-                {description && description}
-              </Text>
-              <Box fontSize="14px" fontWeight="400">
-                {type === "PLAYLIST" &&
-                  `${playlist?.owner?.display_name || owner} · ${
-                    playlist?.tracks?.total || playlist!.length
-                  } total
-                songs`}
-                {type === "ARTIST" &&
-                  `${formatNumber(artist!.followers.total)} total followers`}
-                {type === "ALBUM" && (
-                  <Flex align="center" gap="5px">
-                    <Image
-                      alt="Album Image"
-                      src={album!.images[0].url}
-                      objectFit="contain"
-                      height="28px"
-                      width="28px"
-                      borderRadius="50%"
-                    />
-                    <Text>
-                      {album!.artists[0].name} ·{" "}
-                      {album!.release_date.substring(0, 4)} ·{" "}
-                      {album!.tracks.total} songs
-                    </Text>
-                  </Flex>
-                )}
-              </Box>
-            </Box>
-          </Flex>
-        </Flex>
+        </Box>
+        <Box color="white">
+          <Text>{type.toUpperCase()}</Text>
+          <Heading
+            fontSize={isLargerThan2000 ? "calc(100vw / 24)" : "calc(100vw / 18)"}
+            as="h1"
+            className="break"
+            maxW="calc(100vw - 650px)"
+            minW="320px"
+          >
+            {title}
+          </Heading>
+          {description && (
+            <Text color="gray.500" fontWeight="500" marginBottom="7px">
+              {description}
+            </Text>
+          )}
+          <Box marginBottom={roundedImage ? "25px" : "0"}>{extraText && extraText}</Box>
+        </Box>
       </Flex>
-      <Box zIndex="100" position="relative">
-        {(type === "PLAYLIST" || type === "ALBUM") && !noIndicator && (
-          <SongIndicator type={album ? "album" : undefined} />
-        )}
+      <Box
+        position="relative"
+        bg="rgba(0, 0, 0, 0.2)"
+        minH="calc(69vh - 92px)"
+        paddingX="32px"
+        paddingY="12px"
+      >
         {children}
       </Box>
     </Box>
-  )
-}
-export default GradientBackground
+  );
+};
+
+export default GradientBackground;

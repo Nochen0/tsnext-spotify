@@ -1,42 +1,37 @@
-import {
-  ListItem,
-  Link as ChakraLink,
-  Flex,
-  ListIcon,
-  List,
-} from "@chakra-ui/layout"
-import Link from "next/link"
-import { useRouter } from "next/router"
-import { musicMenuData } from "../../lib/HelperData/SidebarData"
+import { Link, Flex, List, ListIcon, ListItem, Text } from "@chakra-ui/react";
+import NextLink from "next/link";
+import { useRouter } from "next/router";
+import React from "react";
+import { musicMenuData } from "../../lib/Helpers/HelperData";
 
 const MusicMenu = () => {
-  const router = useRouter()
+  const router = useRouter();
 
-  const MusicMenuElements = musicMenuData.map((element, index) => {
-    const isActive = router.asPath === element.route
+  const MusicMenuElements = musicMenuData.map((menu) => {
+    const currentRoute = router.asPath;
 
     return (
-      <ListItem key={index}>
-        <Link href={element.route} passHref>
-          <ChakraLink
-            _focus={{ boxShadow: "0px" }}
-            color={isActive ? "white" : "gray.400"}
-            _hover={{ textDecoration: "none", color: "white" }}
-            transitionDuration="300ms"
-          >
-            <Flex align="center" gap="6px">
+      <ListItem
+        key={menu.title}
+        cursor="pointer"
+        color={currentRoute === menu.route ? "white" : "gray.400"}
+      >
+        <NextLink passHref href={menu.route}>
+          <Link _focus={{}} _hover={{ color: "white" }}>
+            <Flex align="center" gap="7px" transitionProperty="color" transitionDuration="150ms">
               <ListIcon
-                as={isActive ? element.icons[0] : element.icons[1]}
+                as={currentRoute === menu.route ? menu.icons[1] : menu.icons[0]}
                 fontSize="28px"
               />
-              <span>{element.title}</span>
+              <Text>{menu.title}</Text>
             </Flex>
-          </ChakraLink>
-        </Link>
+          </Link>
+        </NextLink>
       </ListItem>
-    )
-  })
+    );
+  });
 
-  return <List spacing={3}>{MusicMenuElements}</List>
-}
-export default MusicMenu
+  return <List spacing={3}>{MusicMenuElements}</List>;
+};
+
+export default MusicMenu;
