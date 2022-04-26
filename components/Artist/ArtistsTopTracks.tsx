@@ -1,63 +1,54 @@
-import { Box, Text } from "@chakra-ui/layout"
-import React, { useEffect, useState } from "react"
-import { PlaylistTrack } from "../../lib/Interfaces/interfaces"
-import Song from "../Song/Song"
+import { Box, Heading, Text } from "@chakra-ui/react";
+import React, { useState } from "react";
+import { ArtistsTopTracks } from "../../lib/Interfaces/interfaces";
+import Song from "../Songs/Song";
 
 type Props = {
-  topTracks: PlaylistTrack[]
-}
+  tracks: ArtistsTopTracks;
+};
 
-const ArtistsTopTracks: React.FC<Props> = ({ topTracks }) => {
-  const [modified, setModified] = useState<{ track: PlaylistTrack }[]>()
-  const [more, setMore] = useState(false)
-
-  useEffect(() => {
-    const modified = topTracks?.map(track => {
-      return { track }
-    })
-    setModified(modified)
-  }, [topTracks])
+const ArtistsTopTracks: React.FC<Props> = ({ tracks }) => {
+  const [seeMore, setSeeMore] = useState(false);
 
   return (
-    <Box paddingRight="15%">
-      {!more
-        ? modified?.slice(0, 5).map((track, index: number) => {
-            return (
-              <Song
-                key={index}
-                track={track as unknown as PlaylistTrack}
-                index={index}
-                total={-1}
-                tracks={modified as unknown as PlaylistTrack[]}
-                artist
-              />
-            )
-          })
-        : modified?.slice(0, 10).map((track, index: number) => {
-            return (
-              <Song
-                key={index}
-                track={track as unknown as PlaylistTrack}
-                index={index}
-                total={-1}
-                tracks={modified as unknown as PlaylistTrack[]}
-                artist
-              />
-            )
-          })}
-      <Text
-        onClick={() => setMore(prev => !prev)}
-        paddingLeft="15px"
-        marginTop="12px"
-        color="gray.300"
-        transitionDuration="300ms"
-        _hover={{ color: "white" }}
-        cursor="pointer"
-        marginBottom="24px"
-      >
-        SEE MORE
-      </Text>
+    <Box marginTop="20px" w="70%" minW="630px">
+      <Heading as="h2" color="white" fontSize="22px" marginBottom="20px">
+        Popular
+      </Heading>
+      <Box>
+        {tracks.tracks.map((track, index) => {
+          if (!seeMore) {
+            if (index >= 5) return;
+          }
+
+          // I modified the tracks to satisfy the 'PlaylistTrack' interface
+
+          return (
+            <Song
+              key={index}
+              index={index + 1}
+              track={{ track }}
+              isArtist
+              allTracks={tracks.tracks.map((track) => {
+                return { track };
+              })}
+            />
+          );
+        })}
+        <Text
+          cursor="pointer"
+          marginLeft="34px"
+          marginY="16px"
+          color="gray.500"
+          _hover={{ color: "white" }}
+          onClick={() => setSeeMore((prevState) => !prevState)}
+          display="inline-block"
+        >
+          SEE MORE
+        </Text>
+      </Box>
     </Box>
-  )
-}
-export default ArtistsTopTracks
+  );
+};
+
+export default ArtistsTopTracks;
