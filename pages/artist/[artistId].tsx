@@ -1,122 +1,106 @@
-import { Box, Text } from "@chakra-ui/layout"
-import { GetServerSideProps, GetServerSidePropsContext } from "next"
-import { useSession } from "next-auth/react"
-import { useRouter } from "next/router"
-import { useEffect, useState } from "react"
-import ArtistsAlbums from "../../components/Artist/ArtistsAlbums"
-import ArtistsTopTracks from "../../components/Artist/ArtistsTopTracks"
-import { getColor } from "../../lib/HelperData/HelperFunctions"
+import { Text } from "@chakra-ui/react";
+import { GetServerSideProps, GetServerSidePropsContext } from "next";
+import { useSession } from "next-auth/react";
+import Head from "next/head";
+import { useRouter } from "next/router";
+import React, { useEffect, useState } from "react";
+import GradientBackground from "../../components/Layout/GradientBackground";
+import { getColor } from "../../lib/Helpers/HelperFunctions";
 import {
-  Artist,
-  ArtistRelatedArtists as RelatedArtists,
-  ArtistsAlbums as ArtistAlbums,
-  PlaylistTrack,
-} from "../../lib/Interfaces/interfaces"
-import spotify from "../../lib/SpotifyApi/spotify"
-import ArtistRelatedArtists from "../../components/Artist/ArtistRelatedArtists"
-import GradientBackground from "../../components/Layout/GradientBackground"
-import Head from "next/head"
+  ArtistRelatedArtists as _ArtistRelatedArtists,
+  ArtistsAlbums as _ArtistsAlbums,
+  ArtistsTopTracks as _ArtistsTopTracks,
+  ExternalArtist,
+} from "../../lib/Interfaces/interfaces";
+import spotify from "../../lib/Spotify/spotify";
+import { formatNumber } from "../../lib/Helpers/HelperFunctions";
+import ArtistsTopTracks from "../../components/Artist/ArtistsTopTracks";
+import ArtistsAlbums from "../../components/Artist/ArtistsAlbums";
+import ArtistRelatedArtists from "../../components/Artist/ArtistRelatedArtists";
+import { unstable_batchedUpdates } from "react-dom";
+import AppLoading from "../../components/Layout/AppLoading";
 
 const Artist = ({ color }: { color: { color: string } }) => {
-  const { data: session } = useSession()
-  const [artist, setArtist] = useState<Artist>()
-  const router = useRouter()
-  const artistId = router.query.artistId
-  const [artistsTopTracks, setArtistsTopTracks] = useState<PlaylistTrack[]>()
-  const [artistRelatedArtists, setArtistRelatedArtists] =
-    useState<RelatedArtists>()
-  const [invalidId, setInvalidId] = useState(false)
-  const [artistAlbums, setArtistAlbums] = useState<ArtistAlbums>()
+  const { data: session } = useSession();
+  const router = useRouter();
+  const artistId = router.query.artistId;
+  const [artist, setArtist] = useState<ExternalArtist>();
+  const [invalidId, setInvalidId] = useState(false);
+  const [artistsTopTracks, setArtistsTopTracks] = useState<_ArtistsTopTracks>();
+  const [artistsAlbums, setArtistsAlbums] = useState<_ArtistsAlbums>();
+  const [relatedArtists, setRelatedArtists] = useState<_ArtistRelatedArtists>();
 
   useEffect(() => {
-    ;(async () => {
+    (async () => {
       if (session?.accessToken) {
-        const [artistRes, topTracks, artistsAlbums, relatedArtists] =
-          await Promise.all([
+        const [artistResponse, tracksResponse, albumsResponse, relatedResponse] = await Promise.all(
+          [
             spotify.getArtist(artistId, session.accessToken),
             spotify.getArtistsTopTracks(artistId, session.accessToken),
             spotify.getArtistsAlbums(artistId, session.accessToken),
             spotify.getArtistRelatedArtists(artistId, session.accessToken),
-          ])
-        if (artistRes?.error) {
-          setInvalidId(true)
+          ]
+        );
+        if (artistResponse?.error?.message === "invalid id") {
+          console.log(artistResponse.error);
+          setInvalidId(true);
         } else {
-          setArtist(artistRes)
-          setArtistsTopTracks(topTracks.tracks)
-          setArtistAlbums(artistsAlbums)
-          setArtistRelatedArtists(relatedArtists)
+          unstable_batchedUpdates(() => {
+            setArtistsTopTracks(tracksResponse);
+            setRelatedArtists(relatedResponse);
+            setArtistsAlbums(albumsResponse);
+            setArtist(artistResponse);
+          });
         }
       }
-    })()
-  }, [session, artistId])
+    })();
+  }, [session, artistId]);
 
   useEffect(() => {
     if (invalidId) {
-      router.push("/404")
+      router.push("/404");
     }
-  }, [invalidId])
+  }, [invalidId, router]);
 
   return (
     <>
-      <Head>
-        <title>{artist?.name} | Spotify</title>
-      </Head>
+      <Head>{artist?.id && <title>{artist.name} | Spotify</title>}</Head>
       {artist?.id ? (
         <GradientBackground
-          title={artist.name}
-          type="ARTIST"
+          type="artist"
           color={color.color}
-          imageUrl={artist.images[0]?.url}
+          image={artist.images[0].url}
+          title={artist.name}
           roundedImage
-          artist={artist}
+          extraText={
+            <Text fontSize="14px">{formatNumber(artist.followers.total)} total followers</Text>
+          }
         >
-          <Box position="relative" paddingY="12px" paddingBottom="40px">
-            <Text fontSize="2xl" marginBottom="30px">
-              Popular
-            </Text>
-            {artistsTopTracks && (
-              <ArtistsTopTracks topTracks={artistsTopTracks} />
-            )}
-            <Text fontSize="2xl" marginBottom="30px">
-              Albums
-            </Text>
-            {artistAlbums && (
-              <ArtistsAlbums
-                slice={7}
-                artistId={artistId}
-                albums={artistAlbums}
-              />
-            )}
-            <Text fontSize="2xl" marginY="30px">
-              Related Artists
-            </Text>
-            {artistRelatedArtists && (
-              <ArtistRelatedArtists
-                artistId={artistId}
-                artists={artistRelatedArtists.artists}
-              />
-            )}
-          </Box>
+          {artistsTopTracks && <ArtistsTopTracks tracks={artistsTopTracks} />}
+          {artistsAlbums?.items && artistsAlbums.items.length > 0 && <ArtistsAlbums albums={artistsAlbums} />}
+          {relatedArtists?.artists && relatedArtists.artists.length > 0 && <ArtistRelatedArtists artists={relatedArtists} />}
         </GradientBackground>
-      ) : null}
+      ) : (
+        <AppLoading />
+      )}
     </>
-  )
-}
+  );
+};
 
-export default Artist
+export default Artist;
 
 export const getServerSideProps: GetServerSideProps = async (
   context: GetServerSidePropsContext
 ) => {
   if (context.params?.artistId) {
-    const artistId = context.params.artistId
-    const color = await getColor(artistId as string)
-    return color
-  }
+    const artistId = context.params.artistId;
 
+    const color = await getColor(artistId);
+    return color;
+  }
   return {
     props: {
       color: undefined,
     },
-  }
-}
+  };
+};

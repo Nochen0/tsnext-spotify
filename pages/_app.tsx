@@ -1,10 +1,10 @@
-import "../global-styles.css"
-import { AppProps } from "next/app"
-import { ChakraProvider, extendTheme } from "@chakra-ui/react"
-import AppLayout from "../components/Layout/AppLayout"
-import { SessionProvider } from "next-auth/react"
-import { Provider as ReduxProvider } from "react-redux"
-import store from "../store/store"
+import type { AppProps } from "next/app";
+import { ChakraProvider, extendTheme } from "@chakra-ui/react";
+import "../global-styles.css";
+import AppLayout from "../components/Layout/AppLayout";
+import { SessionProvider } from "next-auth/react";
+import { Provider as ReduxProvider } from "react-redux";
+import store from "../store/store";
 
 const theme = extendTheme({
   colors: {
@@ -39,23 +39,20 @@ const theme = extendTheme({
     heading: "Montserrat",
     body: "Montserrat",
   },
-})
+});
 
-const MyApp = ({
-  Component,
-  pageProps: { session, ...pageProps },
-}: AppProps) => {
+const MyApp = ({ Component, pageProps: { session, ...pageProps } }: AppProps) => {
   return (
-    <SessionProvider session={session}>
-      <ChakraProvider theme={theme}>
-        <ReduxProvider store={store}>
-          <AppLayout>
-            <Component {...pageProps} />
-          </AppLayout>
-        </ReduxProvider>
-      </ChakraProvider>
-    </SessionProvider>
-  )
-}
+      <SessionProvider session={session}>
+        <ChakraProvider theme={theme}>
+          <ReduxProvider store={store}>
+            <AppLayout>
+              <Component {...pageProps} />
+            </AppLayout>
+          </ReduxProvider>
+        </ChakraProvider>
+      </SessionProvider>
+  );
+};
 
-export default MyApp
+export default MyApp;

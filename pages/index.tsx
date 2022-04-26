@@ -1,28 +1,8 @@
-import { Box } from "@chakra-ui/layout"
-import { useEffect } from "react"
-import { useRouter } from "next/router"
-import Head from "next/head"
+import { Box } from "@chakra-ui/react";
+import type { NextPage } from "next";
 
-const Home = () => {
-  const router = useRouter()
+const Home: NextPage = () => {
+  return <Box>Home</Box>;
+};
 
-  useEffect(() => {
-    router.replace("/collection/playlists")
-  }, [router])
-
-  return (
-    <>
-      <Head>
-        <title>Your Library | Spotify</title>
-      </Head>
-      <Box
-        bg="#121212"
-        height="100%"
-        width="calc(100vw - 260px)"
-        overflowY="auto"
-      ></Box>
-    </>
-  )
-}
-
-export default Home
+export default Home;

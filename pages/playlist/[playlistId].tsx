@@ -1,90 +1,100 @@
-import { useRouter } from "next/router"
-import GradientBackground from "../../components/Layout/GradientBackground"
-import { GetServerSideProps, GetServerSidePropsContext } from "next"
-import { getColor } from "../../lib/HelperData/HelperFunctions"
-import { useEffect, useState } from "react"
-import spotify from "../../lib/SpotifyApi/spotify"
-import { useSession } from "next-auth/react"
-import { Playlist } from "../../lib/Interfaces/interfaces"
-import Loading from "../../components/Layout/Loading"
-import Song from "../../components/Song/Song"
-import Head from "next/head"
+import { Text } from "@chakra-ui/react";
+import { GetServerSideProps, GetServerSidePropsContext } from "next";
+import { useSession } from "next-auth/react";
+import Head from "next/head";
+import { useRouter } from "next/router";
+import React, { useEffect, useState } from "react";
+import AppLoading from "../../components/Layout/AppLoading";
+import GradientBackground from "../../components/Layout/GradientBackground";
+import Song from "../../components/Songs/Song";
+import SongIndicator from "../../components/Songs/SongIndicator";
+import { getColor, msToTime } from "../../lib/Helpers/HelperFunctions";
+import { Playlist } from "../../lib/Interfaces/interfaces";
+import spotify from "../../lib/Spotify/spotify";
 
 const Playlist = ({ color }: { color: { color: string } }) => {
-  const router = useRouter()
-  const { data: session } = useSession()
-  const { playlistId } = router.query
-  const [playlist, setPlaylist] = useState<Playlist>()
-  const [invalidId, setInvalidId] = useState(false)
+  const { data: session } = useSession();
+  const [playlist, setPlaylist] = useState<Playlist>();
+  const router = useRouter();
+  const playlistId = router.query.playlistId;
+  const [invalidId, setInvalidId] = useState(false);
 
   useEffect(() => {
-    ;(async () => {
+    (async () => {
       if (session?.accessToken) {
-        const response = await spotify.getPlaylist(
-          playlistId,
-          session.accessToken
-        )
-        if (response?.error) {
-          setInvalidId(true)
+        const playlistResponse = await spotify.getPlaylist(playlistId, session.accessToken);
+        if (playlistResponse?.error?.message === "Invalid playlist Id") {
+          setInvalidId(true);
         } else {
-          setPlaylist(response)
+          setPlaylist(playlistResponse);
         }
       }
-    })()
-  }, [playlistId, session])
+    })();
+  }, [session, playlistId]);
 
   useEffect(() => {
     if (invalidId) {
-      router.push("/404")
+      router.push("/404");
     }
-  }, [invalidId])
+  }, [invalidId, router]);
 
   return (
     <>
-      <Head>
-        <title>{playlist?.name} - Spotify</title>
-      </Head>
+      <Head>{playlist?.id && <title>{playlist.name} | Spotify</title>}</Head>
       {playlist?.id ? (
         <GradientBackground
+          type="playlist"
           color={color.color}
-          playlist={playlist}
-          imageUrl={playlist.images[0].url}
-          type="PLAYLIST"
           title={playlist.name}
+          image={playlist.images[0].url}
           description={playlist.description}
+          extraText={
+            <Text fontSize="14px">
+              {playlist.owner.display_name} ·{" "}
+              <Text display="inline" fontWeight="500">
+                {playlist.tracks.total} songs,{" "}
+                <Text display="inline" color="gray.400">
+                  {msToTime(
+                    playlist.tracks.items.reduce((acc, cur) => acc + cur.track.duration_ms, 0)
+                  )}
+                </Text>
+              </Text>
+            </Text>
+          }
         >
+          <SongIndicator />
           {playlist.tracks.items.map((track, index) => {
             return (
               <Song
-                key={index}
+                key={track.track.id}
                 track={track}
-                index={index}
-                total={playlist.tracks.total}
-                tracks={playlist.tracks.items}
+                index={index + 1}
+                allTracks={playlist.tracks.items}
               />
-            )
+            );
           })}
         </GradientBackground>
       ) : (
-        <Loading />
+        <AppLoading />
       )}
     </>
-  )
-}
-export default Playlist
+  );
+};
+
+export default Playlist;
 
 export const getServerSideProps: GetServerSideProps = async (
   context: GetServerSidePropsContext
 ) => {
   if (context.params?.playlistId) {
-    const playlistId = context.params.playlistId
+    const playlistId = context.params.playlistId;
 
-    const color = await getColor(playlistId as string)
-    return color
+    const color = await getColor(playlistId);
+    return color;
   }
   return {
     props: {
       color: undefined,
     },
-  }
-}
+  };
+};
