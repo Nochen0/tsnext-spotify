@@ -1,15 +1,17 @@
-import { Box, Flex } from "@chakra-ui/layout"
-import { signOut } from "next-auth/react"
+import { Box, Flex } from "@chakra-ui/react";
+import { signOut } from "next-auth/react";
+import React from "react";
 
 const HeaderPopup = () => {
   return (
     <Box
-      position="fixed"
+      position="absolute"
+      border="1px solid black"
+      right="0"
       width="160px"
       height="36px"
       padding="3px"
-      right="26px"
-      top="55px"
+      top="38px"
       cursor="pointer"
       bg="#242424"
       borderRadius="4px"
@@ -23,12 +25,13 @@ const HeaderPopup = () => {
         paddingLeft="12px"
         _hover={{ background: "rgba(255, 255, 255, .05)" }}
         onClick={() => {
-          signOut()
+          signOut();
         }}
       >
         Log out
       </Flex>
     </Box>
-  )
-}
-export default HeaderPopup
+  );
+};
+
+export default HeaderPopup;
