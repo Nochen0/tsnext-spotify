@@ -15,6 +15,11 @@ cd tsnext-spotify
 npm install
 npm run dev
 ```
+or
+```
+yarn install
+yarn dev
+```
 
 ## Description
 
